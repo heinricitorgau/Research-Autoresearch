@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="Research-Autoresearch" width="100%">
+</p>
+
 # autoresearch
 
 這份 README 比較適合把它當成「學習導覽」來讀。

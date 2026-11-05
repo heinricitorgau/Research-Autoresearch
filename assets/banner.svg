@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-label="Research-Autoresearch">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1a12"/>
+      <stop offset="1" stop-color="#163a25"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5ee08f" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#5ee08f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="320" rx="28" fill="url(#bg)"/>
+  <rect x="1" y="1" width="1278" height="318" rx="27" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2"/>
+  <circle cx="230" cy="160" r="142" fill="url(#glow)"/>
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#5ee08f"/></marker></defs>
+  <path d="M253.3 50.4 A 112 112 0 0 1 339.6 136.7" fill="none" stroke="#5ee08f" stroke-width="4" stroke-linecap="round" marker-end="url(#arr)"/>
+  <path d="M339.6 183.3 A 112 112 0 0 1 253.3 269.6" fill="none" stroke="#5ee08f" stroke-width="4" stroke-linecap="round" marker-end="url(#arr)"/>
+  <path d="M206.7 269.6 A 112 112 0 0 1 120.4 183.3" fill="none" stroke="#5ee08f" stroke-width="4" stroke-linecap="round" marker-end="url(#arr)"/>
+  <path d="M120.4 136.7 A 112 112 0 0 1 206.7 50.4" fill="none" stroke="#5ee08f" stroke-width="4" stroke-linecap="round" marker-end="url(#arr)"/>
+  <text x="230.0" y="34.0" text-anchor="middle" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="16" fill="#ffffff" fill-opacity="0.85">propose</text>
+  <text x="356.0" y="166.0" text-anchor="start" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="16" fill="#ffffff" fill-opacity="0.85">train 5 min</text>
+  <text x="230.0" y="300.0" text-anchor="middle" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="16" fill="#ffffff" fill-opacity="0.85">compare</text>
+  <text x="104.0" y="166.0" text-anchor="end" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="16" fill="#ffffff" fill-opacity="0.85">keep</text>
+  <polyline points="170.0,200.0 173.0,195.1 176.0,189.5 179.0,182.4 182.0,174.2 185.0,166.2 188.0,160.0 191.0,156.3 194.0,154.8 197.0,154.3 200.0,153.2 203.0,150.3 206.0,145.7 209.0,140.5 212.0,136.2 215.0,134.0 218.0,134.0 221.0,135.3 224.0,136.4 227.0,135.9 230.0,133.4 233.0,129.6 236.0,126.0 239.0,124.0 242.0,124.3 245.0,126.2 248.0,128.4 251.0,129.3 254.0,128.2 257.0,125.4 260.0,122.0 263.0,119.8 266.0,119.6 269.0,121.5 272.0,124.1 275.0,126.0 278.0,126.0 281.0,124.0 284.0,120.9 287.0,118.3 290.0,117.5" fill="none" stroke="#ffffff" stroke-width="3" stroke-linejoin="round" stroke-opacity="0.9"/>
+  <text x="230" y="226" text-anchor="middle" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="14" fill="#5ee08f">val_bpb ↓</text>
+  <text x="500" y="150" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#ffffff" letter-spacing="-1">Research-Autoresearch</text>
+  <rect x="500" y="172" width="96" height="5" rx="2.5" fill="#5ee08f"/>
+  <text x="500" y="222" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="27" fill="#ffffff" fill-opacity="0.88">A learning edition of an autonomous LLM research loop</text>
+  <text x="500" y="262" font-family="'Cascadia Code', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace" font-size="19" fill="#5ee08f" fill-opacity="0.9">fork of karpathy/autoresearch · CUDA / MPS / CPU</text>
+</svg>
