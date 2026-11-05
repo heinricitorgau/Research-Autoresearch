@@ -4,184 +4,186 @@
 
 # autoresearch
 
-這份 README 比較適合把它當成「學習導覽」來讀。
+**English** · [繁體中文](README.zh-TW.md)
 
-如果你第一次接觸這個 repo，不用先把它想成一個要立刻跑起來的研究系統；更好的方式，是把它看成一份小型案例，學習一個 LLM 實驗專案可以怎麼被整理得夠小、夠清楚、夠容易比較。現在這個 repo 也已經調整成可在 Apple Silicon 上執行學習版實驗，不再只限於 NVIDIA CUDA 環境。
+This README is best read as a learning guide.
+
+If this is your first time in this repo, don't think of it as a research system you need to get running straight away. It is more useful as a small case study: how an LLM experiment project can be kept small, clear and easy to compare. The repo has also been adapted to run the learning-edition experiments on Apple Silicon, so it is no longer limited to NVIDIA CUDA.
 
 ## Timeline
 
-- 2026-03：專案以最小化自動研究場的形式出現，核心想法是把 `train.py` 當成主要實驗面，讓 agent 在固定 5 分鐘預算內反覆提出、執行、比較並保留實驗。
-- 2026-04-09：README 與 `program.md` 被重寫成更偏學習導覽與研究 protocol 的版本，重點從專案宣言轉向「這個 repo 可以學到什麼」與「實驗流程怎麼被制度化」。
-- 2026-04-10：專案進一步調整為可在 Apple Silicon 上執行的學習版。依賴不再綁死 CUDA-only `torch`，`train.py` 與 `prepare.py` 加入 `cuda` / `mps` / `cpu` 裝置偵測與 fallback 路徑，並把 Apple Silicon 的預設模型、batch 與數值穩定性設定調得更保守。
-- 2026-04-10：同一天也補上了 `train.py` 輸出判讀說明，讓第一次看到 `val_bpb`、`training_seconds`、`total_seconds`、`peak_vram_mb` 等欄位時，可以直接把 log 當成學習材料來讀。
-- 2026-07-20：加入 Windows + NVIDIA 消費級 GPU（RTX 4060 8GB 實測）支援：FlexAttention 實作真正的 sliding window（FA3 只支援 Hopper）、依 VRAM 分級的預設值、`GQA_RATIO` 超參數、torch 2.6 相容性修正。同時把平台基礎設施抽成 `runtime.py`，讓 `train.py` 回到純實驗面。
+- 2026-03: the project appears as a minimal automated research playground. The core idea is to make `train.py` the main experiment surface and let an agent repeatedly propose, run, compare and keep experiments within a fixed 5-minute budget.
+- 2026-04-09: the README and `program.md` are rewritten as a learning guide and a research protocol. The focus moves from a project manifesto to "what you can learn from this repo" and "how the experiment workflow is made systematic".
+- 2026-04-10: the project becomes a learning edition that runs on Apple Silicon. Dependencies are no longer tied to a CUDA-only `torch`; `train.py` and `prepare.py` gain `cuda` / `mps` / `cpu` device detection and fallback paths, and the Apple Silicon defaults for model size, batch and numerical stability are made more conservative.
+- 2026-04-10: the same day, a guide to reading `train.py`'s output is added, so that someone seeing fields like `val_bpb`, `training_seconds`, `total_seconds` and `peak_vram_mb` for the first time can read the log as learning material.
+- 2026-07-20: support for Windows + consumer NVIDIA GPUs (tested on an RTX 4060 8GB): real sliding-window attention through FlexAttention (FA3 supports only Hopper), VRAM-tiered defaults, a `GQA_RATIO` hyperparameter and torch 2.6 compatibility fixes. The platform infrastructure is also moved out into `runtime.py`, so `train.py` goes back to being purely the experiment surface.
 
-## 這份專案適合誰
+## Who this project is for
 
-這個 repo 很適合下面幾種讀者：
+This repo suits readers who:
 
-- 想看小型 LLM training loop 長什麼樣子的人
-- 想理解研究專案怎麼拆成固定條件與可變條件的人
-- 想學怎麼把「做實驗」變成一個可重複流程的人
-- 想理解 AI agent 怎麼被放進研究流程裡的人
+- want to see what a small LLM training loop looks like
+- want to understand how a research project is split into fixed and variable conditions
+- want to learn how to turn "running experiments" into a repeatable process
+- want to understand how an AI agent can be put into a research workflow
 
-如果你剛開始接觸模型訓練，這個 repo 的價值不在於功能很多，而在於它把重要觀念壓得很集中。
+If you are new to model training, the value of this repo is not in having many features but in how tightly it concentrates the important ideas.
 
-## 你會在這裡學到什麼
+## What you will learn here
 
-這個 repo 主要在教四件事：
+The repo mainly teaches four things:
 
-1. **研究專案怎麼縮小**
-   不是所有研究都需要大型框架。很多時候，先把問題縮成一個能快速反覆驗證的最小系統，反而更容易學到東西。
+1. **How to shrink a research project**
+   Not all research needs a large framework. Often, shrinking the problem to a minimal system you can verify quickly and repeatedly is the easier way to learn.
 
-2. **什麼該固定、什麼該改**
-   如果資料處理、evaluation 和時間預算一直漂移，你很難知道模型變好是因為想法好，還是因為條件偷偷變了。這個 repo 刻意把固定條件集中起來，把真正的研究變因壓到少數位置。
+2. **What to hold fixed and what to change**
+   If data processing, evaluation and the time budget keep drifting, you can hardly tell whether a model improved because the idea was good or because the conditions quietly changed. This repo deliberately gathers the fixed conditions in one place and squeezes the real research variables into a few spots.
 
-3. **實驗不是單次靈感，而是比較制度**
-   這裡最重要的不是某個特定模型技巧，而是你怎麼建立 baseline、怎麼記錄結果、怎麼決定一個改動該保留還是丟棄。
+3. **Experiments are a system of comparison, not one-off inspiration**
+   The most important thing here is not any particular modelling trick, but how you set a baseline, record results and decide whether a change stays or goes.
 
-4. **agent 可以參與研究，但前提是規則清楚**
-   這個 repo 不只包含訓練程式，也包含 `program.md` 這種「研究 protocol」。它提醒你，讓 agent 做研究，不只是讓它改 code，而是先定義它怎麼工作。
+4. **An agent can take part in research, provided the rules are clear**
+   The repo contains not only training code but also `program.md`, a "research protocol". It is a reminder that letting an agent do research is not just letting it edit code; you first define how it works.
 
-## 先有一個整體概念
+## The big picture first
 
-`autoresearch` 的核心想法很簡單：把研究回圈縮到最短。
+The core idea of `autoresearch` is simple: make the research loop as short as possible.
 
-一輪實驗大致上是這樣：
+One round of experimentation looks roughly like this:
 
-1. 修改 `train.py`
-2. 跑一次固定 5 分鐘的訓練
-3. 讀取 `val_bpb`
-4. 判斷這次改動要保留還是丟棄
+1. Edit `train.py`
+2. Run a fixed 5-minute training
+3. Read `val_bpb`
+4. Decide whether to keep or discard the change
 
-這樣的好處是，研究問題會變得很具體：
+The benefit is that the research questions become concrete:
 
-- 在相同的時間內，哪個設計學得更有效率？
-- 某次改動是真的更好，還是只是多吃了資源？
-- 一個新想法值得保留，還是只是在增加複雜度？
+- In the same amount of time, which design learns more efficiently?
+- Is a change really better, or does it just use more resources?
+- Is a new idea worth keeping, or does it only add complexity?
 
-這跟一般「一直調參直到看起來比較好」的方式不太一樣。這裡更像是在學如何建立一套乾淨的比較規則。
+This differs from the usual "keep tuning until it looks better". It is closer to learning how to set up clean rules for comparison.
 
-## 建議閱讀順序
+## Suggested reading order
 
-如果你是第一次看這個 repo，推薦照下面順序讀：
+If this is your first time in the repo, read in this order:
 
-1. 先讀這份 `README.md`
-   目標是先理解這個 repo 想教什麼，而不是先看細節。
+1. This `README.md` first
+   The aim is to understand what the repo is trying to teach before looking at details.
 
-2. 再讀 `prepare.py`
-   這個檔案幫你看清楚什麼被當成固定實驗環境。資料、tokenizer、evaluation、常數大多在這裡。
+2. Then `prepare.py`
+   This file shows what is treated as the fixed experiment environment. Data, tokenizer, evaluation and constants are mostly here.
 
-3. 接著讀 `train.py`
-   這是最重要的實驗面。模型結構、optimizer、超參數、batch 設定、訓練流程幾乎都集中在這裡。
+3. Then `train.py`
+   This is the most important experiment surface. Model architecture, optimizer, hyperparameters, batch settings and the training loop are nearly all here.
 
-4. 最後讀 `program.md`
-   它不是模型程式，而是 agent 的工作說明。讀完後你會更清楚這個專案怎麼把研究流程 formalize 成一份可執行的規則。
+4. Finally `program.md`
+   It is not model code but the agent's working instructions. After reading it you will see more clearly how the project formalises the research workflow into executable rules.
 
-照這個順序讀，會比較容易分清楚：
+Reading in this order makes it easier to tell apart:
 
-- 哪些東西是基礎設施
-- 哪些東西是研究變因
-- 哪些東西是研究流程
+- what is infrastructure
+- what is a research variable
+- what is the research workflow
 
-## 三個最值得學的檔案
+## The three files most worth studying
 
 ### `prepare.py`
 
-這個檔案可以當成「固定實驗環境」來理解。它大致負責：
+Think of this file as the "fixed experiment environment". It roughly handles:
 
-- 資料下載
-- tokenizer 訓練
-- dataloader
+- downloading data
+- training the tokenizer
+- the dataloader
 - evaluation
-- 一些不希望每輪實驗都改來改去的常數
+- constants that should not change from one experiment to the next
 
-讀它的時候，可以問自己一個問題：為什麼這些內容被放在固定區，而不是交給 agent 一起修改？
+While reading it, ask yourself: why are these things in the fixed area rather than left for the agent to modify too?
 
 ### `train.py`
 
-這是主要的研究操作面。它包含：
+This is the main research surface. It contains:
 
-- 模型架構
-- optimizer
-- 超參數
-- batch 設定
-- 訓練 loop
+- the model architecture
+- the optimizer
+- hyperparameters
+- batch settings
+- the training loop
 
-你可以把它想成這個 repo 的「實驗桌面」。大部分真正值得比較的想法，都會發生在這裡。
+Think of it as the repo's "lab bench". Most of the ideas genuinely worth comparing happen here.
 
 ### `program.md`
 
-這個檔案很適合拿來學「研究流程怎麼被文字化」。它的重點不是模型，而是：
+This file is a good way to learn how a research workflow is written down. Its focus is not the model but:
 
-- baseline 要怎麼建立
-- 實驗結果怎麼記
-- 什麼情況 keep
-- 什麼情況 discard
-- agent 應該怎麼持續工作
+- how to establish a baseline
+- how to record experiment results
+- when to keep
+- when to discard
+- how the agent should keep working
 
-如果你平常只把 README 當專案說明，那這個檔案會很值得特別注意，因為它更像是一份研究操作手冊。
+If you usually treat a README as just a project description, pay special attention to this file: it is more like a research operations manual.
 
-## 這個 repo 最重要的設計觀念
+## The most important design ideas in this repo
 
-### 1. 固定時間預算
+### 1. A fixed time budget
 
-每次訓練都只跑 **5 分鐘 wall clock**。
+Every training run lasts only **5 minutes of wall-clock time**.
 
-這個設定很值得學，因為它直接把問題從「誰跑得比較久」變成「誰在同樣時間內學得比較有效率」。
+This is worth learning from, because it turns the question from "who trained longest" into "who learned most efficiently in the same time".
 
-### 2. 固定評估指標
+### 2. A fixed evaluation metric
 
-主要指標是 **`val_bpb`**，而且越低越好。
+The main metric is **`val_bpb`**, and lower is better.
 
-這讓每一輪實驗都有一個一致的比較基準。對學習者來說，這也很重要，因為你可以更容易看懂一個改動到底帶來了什麼效果。
+That gives every round of experiments a consistent basis for comparison. It matters for learners too, because it makes it easier to see what a change actually did.
 
-### 3. 縮小可變面積
+### 3. A small variable surface
 
-這個 repo 沒有太多分散式訓練設定、巨大的 config 系統或很厚的抽象層。這不是因為那些東西沒價值，而是因為一旦系統太大，學習者就會更難看見真正影響實驗的因素。
+The repo has little in the way of distributed training settings, a huge config system or thick abstraction layers. Not because those have no value, but because once a system gets too big, learners find it harder to see what actually drives the experiment.
 
-### 4. 研究包含「丟棄」
+### 4. Research includes discarding
 
-很多人學做模型時，只注意怎麼產生新改動，卻比較少注意怎麼判斷一個改動不值得留下。這個 repo 特別有教育價值的地方，就是它把 keep / discard 也變成流程的一部分。
+Many people learning to build models focus on producing new changes and pay less attention to judging when a change is not worth keeping. What makes this repo especially educational is that keep / discard is also part of the process.
 
-## 如何先把專案跑起來
+## Getting the project running
 
-如果你想先把專案跑通，可以把這一段當成「建立學習環境」。
+If you want to get the project working first, treat this section as setting up a learning environment.
 
-**需求**：Python 3.10、[uv](https://docs.astral.sh/uv/)，以及下面任一種裝置環境：
+**Requirements**: Python 3.10, [uv](https://docs.astral.sh/uv/), and one of the following devices:
 
-- NVIDIA GPU：最快，也最接近原始設計目標
-- Apple Silicon（MPS）：可跑學習與小規模實驗
-- CPU：可作為閱讀與功能驗證用途，但速度最慢
+- NVIDIA GPU: fastest, and closest to the original design target
+- Apple Silicon (MPS): fine for learning and small-scale experiments
+- CPU: usable for reading along and checking that things work, but slowest
 
-這個 repo 現在會根據裝置自動選擇 `cuda`、`mps` 或 `cpu`。在 NVIDIA GPU 上會優先使用原本的 CUDA 最佳化路徑；在 Apple Silicon 上則會自動退回到 PyTorch 內建 attention 與較保守的 optimizer / precision 設定。
-另外，Apple Silicon 與 CPU 也會自動使用更小的預設模型與 batch，目標是先讓整個實驗回圈能跑通，而不是硬追原始 H100 配置。
+The repo now picks `cuda`, `mps` or `cpu` automatically based on the device. On NVIDIA GPUs it prefers the original CUDA-optimised path; on Apple Silicon it automatically falls back to PyTorch's built-in attention and more conservative optimizer / precision settings.
+Apple Silicon and CPU also automatically use a smaller default model and batch. The goal is to get the whole experiment loop running first, not to chase the original H100 configuration.
 
-這個 repo 用 [`.python-version`](/Users/test/research-autoresearch/.python-version) 指定 `Python 3.10`。如果你有安裝 `pyenv` 或相容工具，進入專案時通常會自動切到這個版本；如果沒有安裝 `pyenv`，可以直接跳過下面那兩行，改用你現有的 Python 3.10 環境即可。
+The repo pins `Python 3.10` in [`.python-version`](.python-version). If you have `pyenv` or a compatible tool installed, it usually switches to this version automatically when you enter the project; if you don't have `pyenv`, skip the two lines below and use your existing Python 3.10 environment.
 
 ```bash
-# 1. 安裝 uv（如果還沒有）
+# 1. Install uv (if you don't have it yet)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. 切到 Python 3.10（只有安裝 pyenv 才需要）
+# 2. Switch to Python 3.10 (only needed with pyenv)
 pyenv install 3.10 -s
 pyenv local 3.10
 
-# 3. 安裝依賴
+# 3. Install dependencies
 uv sync
 
-# 4. 準備資料與 tokenizer（一次性，約 2 分鐘）
+# 4. Prepare data and tokenizer (one-off, about 2 minutes)
 uv run prepare.py
 
-# 5. 跑一次基線訓練（約 5 分鐘）
+# 5. Run one baseline training (about 5 minutes)
 uv run train.py
 ```
 
-如果這五步都能成功完成，你就已經有足夠的環境去閱讀 `train.py` 的輸出、理解整個實驗回圈怎麼運作。
+If all five steps succeed, your environment is enough to read `train.py`'s output and understand how the whole experiment loop works.
 
-如果你看到 `zsh: command not found: pyenv`，代表你的電腦沒有安裝 `pyenv`。這不是錯誤本身，只表示你不能用 `pyenv` 切版本；只要你已經有可用的 Python 3.10，直接從 `uv sync` 開始就可以。
+If you see `zsh: command not found: pyenv`, your machine doesn't have `pyenv` installed. That is not an error in itself; it only means you can't switch versions with `pyenv`. As long as you already have a working Python 3.10, start straight from `uv sync`.
 
-在 Windows + NVIDIA 上也可以不裝 `uv`，直接用系統 Python（3.10+）與 pip：
+On Windows + NVIDIA you can also skip `uv` and use the system Python (3.10+) with pip:
 
 ```powershell
 pip install torch --index-url https://download.pytorch.org/whl/cu126
@@ -190,23 +192,23 @@ python prepare.py
 python train.py
 ```
 
-其中 `triton-windows` 是讓 `torch.compile` 在 Windows 上生效的關鍵（PyPI 的 `triton` 沒有 Windows wheel）；`runtime.py` 啟動時會自動把 `CUDA_PATH` 指向它自帶的 CUDA 工具鏈，不需要另外安裝 CUDA Toolkit。torch 2.6+ 實測可用，不必嚴格對齊 `pyproject.toml` 鎖定的版本。
+`triton-windows` is what makes `torch.compile` work on Windows (the `triton` on PyPI has no Windows wheel). On startup, `runtime.py` automatically points `CUDA_PATH` at the CUDA toolchain bundled with it, so there is no need to install the CUDA Toolkit separately. torch 2.6+ has been tested and works; it does not need to match the version locked in `pyproject.toml` exactly.
 
-如果你是在 Apple Silicon 上執行，速度和可調參空間通常都不會和 NVIDIA GPU 相同。比較合理的期待是：
+If you run on Apple Silicon, speed and the room for tuning are usually not the same as on an NVIDIA GPU. Reasonable expectations are:
 
-1. 先把它跑通，理解整個實驗回圈
-2. 在較小模型與較小 batch 下做學習型實驗
-3. 若要追求原始 repo 的吞吐量，再換到 NVIDIA GPU
+1. Get it running first and understand the whole experiment loop
+2. Do learning experiments with a smaller model and smaller batch
+3. Move to an NVIDIA GPU if you want the original repo's throughput
 
-## 如何讀 `train.py` 的輸出
+## Reading `train.py`'s output
 
-第一次看到 `uv run train.py` 的輸出時，很容易只盯著最後一行 `val_bpb`。其實這份 log 裡有三層資訊：
+The first time you see the output of `uv run train.py`, it is easy to look only at the last `val_bpb` line. In fact the log has three layers of information:
 
-1. **這次跑的是什麼模型**
-2. **這次訓練過程穩不穩、快不快**
-3. **這次實驗最後值不值得拿來比較**
+1. **What model this run used**
+2. **Whether training was stable and fast**
+3. **Whether the result is worth comparing**
 
-下面用一個 Apple Silicon 上成功跑完的例子來看：
+Here is an example of a successful run on Apple Silicon:
 
 ```text
 Vocab size: 8,192
@@ -235,111 +237,111 @@ num_params_M:     5.0
 depth:            4
 ```
 
-這段輸出可以這樣理解：
+This output can be read as follows:
 
 - `Vocab size: 8,192`
-  這代表 tokenizer 有 8192 個 token。這是目前實驗的離散化基礎，會影響 embedding 大小與輸出層大小。
+  The tokenizer has 8192 tokens. This is the discretisation the experiment is built on, and it affects the size of the embedding and output layers.
 
 - `Model config: ...`
-  這是這次實驗實際建立出來的模型設定。從這份輸出可以直接讀到：序列長度是 `2048`、總層數是 `4`、embedding 維度是 `128`、attention pattern 是 `L`。如果你在調 `DEPTH`、`HEAD_DIM`、`WINDOW_PATTERN`，這一行就是第一個確認點。
+  The model configuration this run actually built. From it you can read directly: sequence length `2048`, `4` layers in total, embedding dimension `128`, attention pattern `L`. If you are tuning `DEPTH`, `HEAD_DIM` or `WINDOW_PATTERN`, this line is the first thing to check.
 
 - `Parameter counts: ... total : 4,980,872`
-  這代表目前模型大約是 `5.0M` 參數。對 Apple Silicon 來說，這是一個偏學習用途的小模型設定，目標是先穩定跑完整個實驗回圈，而不是追求大模型吞吐。
+  The model has about `5.0M` parameters. On Apple Silicon this is a small, learning-oriented setting; the goal is to finish the whole experiment loop reliably, not to chase large-model throughput.
 
 - `Estimated FLOPs per token: 2.359373e+07`
-  這是每個 token 大致需要多少運算量的估計值。它不是最終成績，但可以幫你理解這次模型大概有多重。
+  An estimate of how much computation each token needs. It is not a final score, but it helps you understand roughly how heavy this model is.
 
 - `Scaling AdamW LRs by 1/sqrt(128/768) = 1.000000`
-  這表示 learning rate 縮放係數最後被壓在 `1.0`。對目前的 Apple Silicon 路徑來說，這是一個刻意保守的設定，目的是避免小模型時 learning rate 被放太大，導致一開始就 `FAIL` 或數值爆掉。
+  The learning-rate scaling factor ended up clamped at `1.0`. On the current Apple Silicon path this is a deliberately conservative setting, to keep a small model's learning rate from being scaled up too far and causing a `FAIL` or numerical blow-up right at the start.
 
 - `Time budget: 300s`
-  這是固定實驗制度的一部分：真正拿來比較的訓練時間是 `300` 秒，也就是 5 分鐘。
+  Part of the fixed experiment system: the training time used for comparison is `300` seconds, i.e. 5 minutes.
 
 - `Gradient accumulation steps: 2`
-  這代表一次 optimizer update 會累積 2 個 micro-batch。這通常是為了在較小裝置上維持總 batch 大小，同時控制單步記憶體壓力。
+  Each optimizer update accumulates 2 micro-batches. This is usually to keep the total batch size on smaller devices while limiting per-step memory pressure.
 
 - `step 00364 ... loss: 5.632492 ... tok/sec: 15,094`
-  這是訓練過程中的即時狀態列。
-  `loss` 是訓練中的交叉熵，主要用來看訓練有沒有爆掉。
-  `tok/sec` 是吞吐量，表示目前每秒大約處理多少 token。
-  在這個例子裡，Apple Silicon 大約是 `15k tok/sec`，這是一個「能跑通、可觀察」的學習型速度，不是用來追求極限效能的數字。
+  The live status line during training.
+  `loss` is the training cross-entropy, mainly used to check that training hasn't blown up.
+  `tok/sec` is throughput: roughly how many tokens are processed per second.
+  In this example Apple Silicon reaches about `15k tok/sec`, a learning speed that "runs and can be observed", not a figure for chasing peak performance.
 
 - `val_bpb: 2.007002`
-  這是最重要的最終指標。`bpb` 是 bits per byte，越低越好。之後不同實驗之間最主要就是比較這個值。
+  The most important final metric. `bpb` is bits per byte, and lower is better. This is the value you compare between experiments.
 
 - `training_seconds: 300.1`
-  這表示真正計入制度的訓練時間約為 300 秒，符合設計預期。
+  The training time counted by the system is about 300 seconds, as designed.
 
 - `total_seconds: 783.5`
-  這表示整個程式從開始到結束總共花了約 783 秒。它比 `training_seconds` 大很多，代表除了訓練本身，Apple Silicon 上還有不少時間花在 setup、prefill、evaluation 與其他 overhead。對 Mac 來說，這是正常的，也提醒你 `training_seconds` 才是更重要的比較基準。
+  The whole program took about 783 seconds from start to finish. It is much larger than `training_seconds`, which means that on Apple Silicon a lot of time goes to setup, prefill, evaluation and other overhead besides training itself. That is normal on a Mac, and a reminder that `training_seconds` is the more important basis for comparison.
 
 - `peak_vram_mb: 66.0`
-  這是裝置記憶體峰值的近似觀察值。對目前 Apple Silicon 路徑來說，這個數字偏小，代表這份學習版配置是很保守的。
+  An approximate observation of peak device memory. On the current Apple Silicon path this number is small, showing that the learning-edition configuration is very conservative.
 
 - `mfu_percent: 0.00`
-  `MFU` 是 model FLOPs utilization。這個指標原本比較適合 CUDA/H100 類型的環境，在 Apple Silicon 路徑上目前沒有代表性，所以看到 `0.00` 是正常的。
+  `MFU` is model FLOPs utilization. The metric is meant for CUDA/H100-type environments and is not meaningful on the Apple Silicon path yet, so `0.00` is normal.
 
 - `total_tokens_M: 6.0`
-  這表示這次 5 分鐘訓練總共處理了大約 `6.0M` token。
+  This 5-minute run processed about `6.0M` tokens in total.
 
 - `num_steps: 365`
-  這是總共做了多少次 optimizer step。之後如果你調大 batch 或改變吞吐，這個數字也會跟著變。
+  The total number of optimizer steps. If you increase the batch or change throughput later, this number changes with it.
 
-- `num_params_M: 5.0`、`depth: 4`
-  這兩個是最後的摘要資訊，方便你在記錄表裡快速知道這次實驗的模型規模。
+- `num_params_M: 5.0`, `depth: 4`
+  The final summary, so you can see the model size at a glance in your records.
 
-對這次輸出，一句話總結就是：**這是一個在 Apple Silicon 上成功跑完整個 5 分鐘訓練回圈的基線學習版實驗**。它的價值不在於 `2.007002` 這個數字本身有多強，而在於它提供了一個穩定、可重複、可比較的起點。之後你若要做實驗，應該拿它當 baseline 去比較，而不是拿它和 H100 上的大模型結果直接相比。
+In one sentence: **this is a baseline learning-edition experiment that completed the full 5-minute training loop on Apple Silicon**. Its value is not in how strong `2.007002` is, but in giving you a stable, repeatable, comparable starting point. When you experiment later, use it as the baseline to compare against, rather than comparing it directly with large-model results on an H100.
 
-## 如果你要把它當教材來看
+## Using it as course material
 
-下面這幾個觀察角度通常很有幫助：
+These angles usually help:
 
-- 觀察 `prepare.py` 和 `train.py` 的分工
-- 觀察哪些設定是固定的，哪些是故意讓實驗去改的
-- 觀察 `program.md` 怎麼把研究流程變成規則
-- 觀察這個 repo 怎麼避免把研究問題擴散成太大的工程問題
+- Look at how `prepare.py` and `train.py` divide the work
+- Look at which settings are fixed and which are deliberately left for experiments to change
+- Look at how `program.md` turns the research workflow into rules
+- Look at how the repo keeps a research question from spreading into too big an engineering problem
 
-這樣讀，你會比較容易把它內化成方法，而不是只把它當成一份可以執行的 codebase。
+Reading this way makes it easier to absorb it as a method, rather than treating it only as a codebase you can run.
 
-## 如果你之後想加入 agent
+## If you want to add an agent later
 
-等你先理解這個 repo 在做什麼之後，再引入 agent 會比較有意義。
+Bringing in an agent makes more sense once you understand what the repo is doing.
 
-一個典型做法是讓 agent 先讀 `program.md`，例如：
+A typical approach is to have the agent read `program.md` first, for example:
 
 ```text
 Hi have a look at program.md and let's kick off a new experiment! let's do the setup first.
 ```
 
-這時候最值得學的點不是 prompt 本身，而是這件事背後的設計思想：你不是只叫 agent 幫你改一段 code，而是在定義一套 agent 應該如何做研究的規則。
+What is most worth learning here is not the prompt itself but the design idea behind it: you are not just asking an agent to change some code, you are defining the rules for how an agent should do research.
 
-## 專案結構
+## Project structure
 
 ```text
-prepare.py      — 固定實驗環境：資料、tokenizer、evaluation、常數
-runtime.py      — 固定平台層：裝置偵測、attention 後端、compile 探測、VRAM 分級
-train.py        — 實驗主體：模型、optimizer、訓練流程
-program.md      — 研究 protocol：agent 的工作規則
-pyproject.toml  — 專案依賴
+prepare.py      — fixed experiment environment: data, tokenizer, evaluation, constants
+runtime.py      — fixed platform layer: device detection, attention backend, compile probing, VRAM tiers
+train.py        — the experiment itself: model, optimizer, training loop
+program.md      — research protocol: the agent's working rules
+pyproject.toml  — project dependencies
 ```
 
-`prepare.py` 和 `runtime.py` 都屬於「不隨實驗改動」的固定區；實驗只發生在 `train.py`。這個切分的目的，是讓實驗 diff 永遠只包含研究變因，而不會混進平台管線的修改。
+`prepare.py` and `runtime.py` are both in the fixed area that does not change between experiments; experiments happen only in `train.py`. The point of this split is that an experiment diff only ever contains research variables, never changes to the platform plumbing.
 
-第一次在新機器上執行 `uv sync` 時，`uv` 會依照目前平台重新解析並建立對應的環境；像 Apple Silicon 和 NVIDIA GPU 這種平台差異較大的情況，這比強行共用同一份舊 lockfile 更安全。
+The first time you run `uv sync` on a new machine, `uv` re-resolves and builds an environment for the current platform. When platforms differ as much as Apple Silicon and NVIDIA GPUs do, this is safer than forcing them to share one old lockfile.
 
-## 如果你的硬體比較小
+## If your hardware is smaller
 
-這份程式碼雖然現在可以在 Apple Silicon 上跑，但原始設計仍然偏向單張 NVIDIA GPU。若你只是想把它當成學習材料，在較小機器上觀察概念，可以先考慮：
+Although the code now runs on Apple Silicon, the original design still leans towards a single NVIDIA GPU. If you just want to use it as learning material and observe the concepts on a smaller machine, consider:
 
-1. 換成熵更低的資料集，例如 [TinyStories](https://huggingface.co/datasets/karpathy/tinystories-gpt4-clean)
-2. 降低 `vocab_size`
-3. 在 `prepare.py` 降低 `MAX_SEQ_LEN`
-4. 在 `prepare.py` 減少 `EVAL_TOKENS`
-5. 在 `train.py` 降低 `DEPTH`
-6. 使用更簡單的 `WINDOW_PATTERN`
-7. 下修 `TOTAL_BATCH_SIZE`
+1. Switching to a lower-entropy dataset such as [TinyStories](https://huggingface.co/datasets/karpathy/tinystories-gpt4-clean)
+2. Lowering `vocab_size`
+3. Lowering `MAX_SEQ_LEN` in `prepare.py`
+4. Reducing `EVAL_TOKENS` in `prepare.py`
+5. Lowering `DEPTH` in `train.py`
+6. Using a simpler `WINDOW_PATTERN`
+7. Reducing `TOTAL_BATCH_SIZE`
 
-這些調整不只是為了「讓它能跑」，也很適合幫助你理解模型規模、資料分布、序列長度和評估成本之間的關係。
+These adjustments are not only for "making it run"; they also help you understand how model size, data distribution, sequence length and evaluation cost relate to each other.
 
 ## License
 
