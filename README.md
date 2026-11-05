@@ -2,9 +2,11 @@
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg"><img src="assets/banner.svg" alt="Research-Autoresearch" width="100%"></picture>
 </p>
 
-# autoresearch
+# Research-Autoresearch
 
 **English** · [繁體中文](README.zh-TW.md)
+
+> A learning edition of karpathy/autoresearch: an autonomous LLM research loop with a fixed 5-minute training budget.
 
 This README is best read as a learning guide.
 

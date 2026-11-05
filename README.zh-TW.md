@@ -2,9 +2,11 @@
   <picture><source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg"><img src="assets/banner.svg" alt="Research-Autoresearch" width="100%"></picture>
 </p>
 
-# autoresearch
+# Research-Autoresearch
 
 [English](README.md) · **繁體中文**
+
+> karpathy/autoresearch 的學習版：在固定 5 分鐘訓練預算內反覆提出、執行、比較實驗的自動化 LLM 研究迴圈。
 
 這份 README 比較適合把它當成「學習導覽」來讀。
 
