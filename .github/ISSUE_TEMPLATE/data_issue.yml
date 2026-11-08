@@ -1,0 +1,47 @@
+name: Data / evaluation issue
+description: Problems with data shards, the tokenizer, or val_bpb evaluation (prepare.py)
+title: "[Data]: "
+labels: ["data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        prepare.py is the fixed experiment environment. Use this form when the data,
+        tokenizer, or evaluation looks wrong — not for training-speed or model questions.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Data download / shards
+        - Tokenizer
+        - Dataloader
+        - Evaluation (val_bpb)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Data source or URL
+      description: The shard URL, dataset name, or cache path involved.
+      placeholder: "~/.cache/autoresearch/..."
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected data / result
+      description: What the data, token counts, or val_bpb should look like.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual data / result
+      description: What you got instead. Paste output or a small sample.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit
+      description: Output of `git rev-parse --short HEAD`.
