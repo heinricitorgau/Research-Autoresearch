@@ -59,10 +59,16 @@ print("\n" + "="*80 + "\n")
 
 fig, ax = plt.subplots(figsize=(16, 8))
 
-# Filter out crashes for plotting
+# Filter out crashes for plotting. A crash is recorded as val_bpb 0.000000
+# (program.md), so it must never serve as the baseline.
 valid = df[df["status"] != "CRASH"].copy()
 valid = valid.reset_index(drop=True)
 
+if valid.empty:
+    print("[ERROR] Every experiment in results.tsv crashed; there is no baseline to plot against.")
+    sys.exit(1)
+
+# The baseline is the first experiment that actually produced a val_bpb.
 baseline_bpb = valid.loc[0, "val_bpb"]
 
 # Only plot points at or below baseline (the interesting region)
@@ -126,8 +132,9 @@ print("\n" + "="*80 + "\n")
 # ---------------------------------------------------------
 
 # Summary stats
+# Reuse the non-crash baseline from above: df.iloc[0] would be 0.0 whenever the
+# first run crashed, turning the improvement into -inf%.
 kept = df[df["status"] == "KEEP"].copy()
-baseline_bpb = df.iloc[0]["val_bpb"]
 
 if kept.empty:
     print(f"Baseline val_bpb:  {baseline_bpb:.6f}")
